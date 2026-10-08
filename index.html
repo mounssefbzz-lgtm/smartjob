@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SmartJob AI helps job seekers analyze their CV and match it with job descriptions.">
+<title>SmartJob AI - Free Job Application Assistant</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#f4f7ff,#eefcf8);
+  color:#172033;
+  min-height:100vh;
+}
+header{
+  background:#ffffff;
+  border-bottom:1px solid #e5e9f2;
+  padding:18px 16px;
+}
+.header-inner{
+  max-width:1000px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo{
+  font-size:24px;
+  font-weight:800;
+  color:#3157d5;
+}
+.badge{
+  background:#eef2ff;
+  color:#3157d5;
+  padding:7px 11px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+.container{
+  max-width:1000px;
+  margin:35px auto;
+  padding:0 16px;
+}
+.hero{text-align:center;margin-bottom:28px}
+.hero h1{
+  font-size:38px;
+  line-height:1.15;
+  margin-bottom:12px;
+}
+.hero p{
+  color:#667085;
+  font-size:16px;
+  max-width:650px;
+  margin:auto;
+  line-height:1.6;
+}
+.card{
+  background:white;
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:0 8px 30px rgba(30,50,90,.08);
+}
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:8px;
+}
+textarea{
+  width:100%;
+  min-height:190px;
+  resize:vertical;
+  border:1px solid #d9dfeb;
+  border-radius:12px;
+  padding:14px;
+  font-size:15px;
+  line-height:1.5;
+  outline:none;
+}
+textarea:focus{border-color:#3157d5}
+.field{margin-bottom:18px}
+button{
+  border:0;
+  border-radius:11px;
+  padding:13px 18px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+.primary{
+  width:100%;
+  background:#3157d5;
+  color:white;
+  font-size:16px;
+}
+.primary:hover{background:#2447bd}
+.secondary{
+  background:#eef2ff;
+  color:#3157d5;
+}
+.demo{
+  margin-top:10px;
+  background:#f4f5f7;
+  color:#344054;
+  width:100%;
+}
+#results{display:none}
+.score-box{
+  text-align:center;
+  padding:25px;
+  background:#f7f9ff;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+.score{
+  font-size:55px;
+  font-weight:800;
+  color:#3157d5;
+}
+.score-label{
+  color:#667085;
+  margin-top:5px;
+}
+.section-title{
+  font-size:19px;
+  font-weight:800;
+  margin:22px 0 12px;
+}
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.chip{
+  padding:8px 11px;
+  border-radius:20px;
+  background:#eef2ff;
+  color:#3157d5;
+  font-size:13px;
+  font-weight:600;
+}
+.missing{
+  background:#fff3e8;
+  color:#c35a00;
+}
+.suggestion{
+  padding:12px;
+  border-left:4px solid #3157d5;
+  background:#f7f9ff;
+  margin-bottom:9px;
+  border-radius:7px;
+  line-height:1.5;
+}
+.cover{
+  background:#fafafa;
+  border:1px solid #e5e7eb;
+  padding:17px;
+  border-radius:12px;
+  white-space:pre-wrap;
+  line-height:1.6;
+  font-size:14px;
+}
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.actions button{flex:1}
+footer{
+  text-align:center;
+  color:#98a2b3;
+  padding:30px 15px;
+  font-size:13px;
+}
+@media(max-width:600px){
+  .hero h1{font-size:30px}
+  .card{padding:17px}
+  .header-inner{gap:10px}
+  .logo{font-size:20px}
+  .score{font-size:48px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">SmartJob AI</div>
+    <div class="badge">FREE TOOL</div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <h1>Make Your CV Match the Job</h1>
+    <p>
+      Analyze your CV against any job description, discover missing keywords,
+      improve your application and create a personalized cover letter.
+    </p>
+  </section>
+
+  <section class="card">
+
+    <div class="field">
+      <label for="cv">Your CV</label>
+      <textarea id="cv" placeholder="Paste your CV here...
+
+Example:
+Name: John Smith
+Marketing graduate with experience in social media, customer service and Microsoft Office..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="job">Job Description</label>
+      <textarea id="job" placeholder="Paste the job description here...
+
+Example:
+We are looking for a customer service representative with communication skills, Microsoft Office knowledge and sales experience..."></textarea>
+    </div>
+
+    <button class="primary" onclick="analyzeCV()">
+      Analyze My CV
+    </button>
+
+    <button class="demo" onclick="loadDemo()">
+      Try Demo Example
+    </button>
+
+  </section>
+
+  <section id="results">
+
+    <div class="card">
+
+      <div class="score-box">
+        <div class="score" id="score">0%</div>
+        <div class="score-label">CV / Job Match Score</div>
+      </div>
+
+      <div class="section-title">Matched Keywords</div>
+      <div class="chips" id="matched"></div>
+
+      <div class="section-title">Missing Keywords</div>
+      <div class="chips" id="missing"></div>
+
+      <div class="section-title">Suggestions</div>
+      <div id="suggestions"></div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="section-title">Personalized Cover Letter</div>
+
+      <div class="cover" id="coverLetter"></div>
+
+      <div class="actions">
+        <button class="secondary" onclick="copyLetter()">
+          Copy Cover Letter
+        </button>
+
+        <button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+          Analyze Again
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  SmartJob AI © 2026 — Helping job seekers apply smarter.
+</footer>
+
+<script>
+
+const stopWords = new Set([
+"the","and","for","with","that","this","from","your","you","are",
+"have","has","will","our","their","they","job","work","working",
+"about","into","than","then","them","there","here","been","being",
+"was","were","who","what","when","where","which","while","also",
+"can","all","any","but","not","out","use","using","more","very",
+"our","we","as","an","a","to","of","in","on","at","or","is","it",
+"be","by","required","requirements","role","position"
+]);
+
+function words(text){
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9+#.\s]/g," ")
+    .split(/\s+/)
+    .map(w=>w.trim())
+    .filter(w=>w.length>2 && !stopWords.has(w));
+}
+
+function analyzeCV(){
+
+  const cv = document.getElementById("cv").value.trim();
+  const job = document.getElementById("job").value.trim();
+
+  if(!cv || !job){
+    alert("Please paste both your CV and the job description.");
+    return;
+  }
+
+  const cvWords = new Set(words(cv));
+  const jobWords = [...new Set(words(job))];
+
+  const matched = jobWords.filter(word => cvWords.has(word));
+  const missing = jobWords.filter(word => !cvWords.has(word));
+
+  let score = Math.round((matched.length / Math.max(jobWords.length,1))*100);
+
+  if(score > 100) score = 100;
+
+  document.getElementById("score").textContent = score + "%";
+
+  const matchedBox = document.getElementById("matched");
+  const missingBox = document.getElementById("missing");
+
+  matchedBox.innerHTML = "";
+  missingBox.innerHTML = "";
+
+  matched.slice(0,25).forEach(word=>{
+    const span=document.createElement("span");
+    span.className="chip";
+    span.textContent=word;
+    matchedBox.appendChild(span);
+  });
+
+  if(matched.length===0){
+    matchedBox.innerHTML="<span class='chip'>No strong matches found</span>";
+  }
+
+  missing.slice(0,25).forEach(word=>{
+    const span=document.createElement("span");
+    span.className="chip missing";
+    span.textContent=word;
+    missingBox.appendChild(span);
+  });
+
+  if(missing.length===0){
+    missingBox.innerHTML="<span class='chip'>Great! No important keywords appear to be missing.</span>";
+  }
+
+  const suggestions=[];
+
+  if(score < 40){
+    suggestions.push("Your CV has a low keyword match. Try adding relevant skills and responsibilities from the job description when they genuinely describe your experience.");
+  }else if(score < 70){
+    suggestions.push("Your CV has a moderate match. Add more relevant keywords and specific achievements that are supported by your real experience.");
+  }else{
+    suggestions.push("Your CV has a strong keyword match. Focus on making your achievements specific and measurable.");
+  }
+
+  if(cv.length < 500){
+    suggestions.push("Your CV looks quite short. Consider adding relevant skills, education, projects, certifications or achievements.");
+  }
+
+  const actionWords=[
+    "managed","created","developed","organized","improved",
+    "led","achieved","supported","coordinated","increased"
+  ];
+
+  const hasAction = actionWords.some(w=>cv.toLowerCase().includes(w));
+
+  if(!hasAction){
+    suggestions.push("Use strong action verbs such as managed, created, developed, organized and improved where they accurately describe your experience.");
+  }
+
+  const suggestionBox=document.getElementById("suggestions");
+  suggestionBox.innerHTML="";
+
+  suggestions.forEach(text=>{
+    const div=document.createElement("div");
+    div.className="suggestion";
+    div.textContent=text;
+    suggestionBox.appendChild(div);
+  });
+
+  const cover = createCoverLetter(cv,job);
+  document.getElementById("coverLetter").textContent=cover;
+
+  document.getElementById("results").style.display="block";
+
+  document.getElementById("results").scrollIntoView({
+    behavior:"smooth"
+  });
+}
+
+function createCoverLetter(cv,job){
+
+  let jobTitle="the position";
+
+  const titlePatterns=[
+    /position of ([a-zA-Z\s]+)/i,
+    /role of ([a-zA-Z\s]+)/i,
+    /looking for (?:a|an) ([a-zA-Z\s]+)/i
+  ];
+
+  for(const pattern of titlePatterns){
+    const match=job.match(pattern);
+    if(match){
+      jobTitle=match[1].trim().split("\n")[0];
+      break;
+    }
+  }
+
+  return `Dear Hiring Manager,
+
+I am writing to express my interest in ${jobTitle}.
+
+I believe my background, skills and motivation make me a strong candidate for this opportunity. I am highly motivated to learn, contribute to your team and develop my professional experience.
+
+I would welcome the opportunity to discuss how I can contribute to your organization.
+
+Thank you for considering my application. I look forward to hearing from you.
+
+Kind regards,
+[Your Name]`;
+}
+
+function copyLetter(){
+
+  const text=document.getElementById("coverLetter").textContent;
+
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("Cover letter copied!");
+  }).catch(()=>{
+    alert("Please select and copy the cover letter manually.");
+  });
+}
+
+function loadDemo(){
+
+  document.getElementById("cv").value=
+`John Smith
+
+Marketing graduate with strong communication and customer service skills.
+
+Skills:
+Customer service
+Communication
+Microsoft Office
+Social media
+Sales
+Teamwork
+Organization
+
+Education:
+Bachelor's Degree in Business Administration
+
+Motivated, reliable and willing to learn new skills.`;
+
+  document.getElementById("job").value=
+`Customer Service Representative
+
+We are looking for a motivated customer service representative.
+
+Requirements:
+Strong communication skills
+Customer service experience
+Microsoft Office knowledge
+Sales skills
+Teamwork
+Organization
+Problem solving
+Good communication with customers.`;
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+</script>
+
+</body>
+</html>
